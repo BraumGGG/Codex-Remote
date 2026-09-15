@@ -1,0 +1,6 @@
+Codex Bridge Windows 封闭测试版未使用 Authenticode 签名。
+
+Windows SmartScreen 可能显示“Windows 已保护你的电脑”或“未知发布者”。这不代表文件已被验证安全。
+安装前必须从发布页核对 SHA256SUMS.txt 中的 SHA-256；哈希不一致时不要运行。
+
+封闭测试阶段不购买商业代码签名证书。产品获得稳定收入后再启用 Authenticode，并在发布说明中公布证书主体和指纹。

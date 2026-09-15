@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="codex-bridge-ui-build" content="2026090208">
+  <title>Codex Remote</title>
+  <link rel="stylesheet" href="/remote/app.css?v=2026090208">
+  <link rel="stylesheet" href="/remote/mobile-handoff.css?v=2026090208">
+  <script src="/remote/vendor/marked.min.js" defer></script>
+  <script src="/remote/vendor/purify.min.js" defer></script>
+  <script type="module" src="/remote/app.js?v=2026090208"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到内容</a>
+
+  <main id="pair-view" class="pair-view" aria-labelledby="pair-title">
+    <section class="pair-panel">
+      <header class="mobile-appbar pair-appbar">
+        <span class="mobile-appbar-title">连接电脑</span>
+        <button id="pair-settings-button" class="mobile-icon-button" type="button" aria-label="打开设置" title="设置"><span aria-hidden="true">&#9881;</span></button>
+      </header>
+      <div class="brand-lockup" aria-label="Codex Remote">
+        <span class="brand-mark" aria-hidden="true">C</span>
+        <span>Codex Remote</span>
+      </div>
+      <div class="pair-heading">
+        <p class="eyebrow">SECURE REMOTE ACCESS</p>
+        <h1 id="pair-title">正在连接电脑</h1>
+        <p class="pair-description">正在建立端到端加密通道，连接成功后会自动载入项目和会话。</p>
+      </div>
+      <p id="pair-host-status" class="pair-status">正在连接安全信令</p>
+      <div id="connection-actions" class="connection-actions">
+        <button id="retry-button" class="primary-button" type="button">重试连接</button>
+        <button id="scan-button" class="secondary-button" type="button" hidden>扫描二维码</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="workspace-view" class="workspace-view" hidden>
+    <aside class="sidebar" aria-label="项目和会话">
+      <header class="sidebar-header">
+        <div class="brand-lockup compact">
+          <span class="brand-mark" aria-hidden="true">C</span>
+          <span>Codex Remote</span>
+        </div>
+        <button id="disconnect-button" class="text-button" type="button">断开</button>
+      </header>
+
+      <section class="host-strip" aria-label="连接状态">
+        <span id="online-dot" class="status-dot"></span>
+        <div>
+          <strong id="host-label">Windows 电脑</strong>
+          <span id="host-state">正在连接</span>
+        </div>
+        <span id="tier-badge" class="tier-badge">只读</span>
+      </section>
+      <div class="mobile-workspace-heading">
+        <div><h1>项目与会话</h1><p id="mobile-host-summary">已连接的 Windows 电脑</p></div>
+        <button id="mobile-refresh-button" class="mobile-icon-button" type="button" aria-label="刷新项目" title="刷新"><span aria-hidden="true">&#8635;</span></button>
+      </div>
+
+      <nav id="project-list" class="project-list" aria-label="项目会话"></nav>
+    </aside>
+
+    <section id="main-content" class="conversation" aria-label="会话内容">
+      <header class="conversation-header">
+        <button id="back-button" class="icon-button mobile-only" type="button" aria-label="返回会话列表" title="返回">
+          <span aria-hidden="true">←</span>
+        </button>
+        <div class="conversation-title">
+          <span id="conversation-project">选择项目</span>
+          <h1 id="conversation-name">选择一个会话</h1>
+        </div>
+        <button id="refresh-button" class="icon-button" type="button" aria-label="刷新当前会话" title="刷新" disabled>
+          <span aria-hidden="true">↻</span>
+        </button>
+      </header>
+
+      <div id="empty-state" class="empty-state">
+        <span class="empty-monogram" aria-hidden="true">C</span>
+        <p>选择一个会话查看实时内容</p>
+      </div>
+
+      <div id="message-list" class="message-list" aria-live="polite" hidden></div>
+      <button id="jump-latest" class="jump-latest secondary-button" type="button" hidden>回到最新消息</button>
+      <div id="execution-status" class="execution-status" role="status" aria-live="polite" hidden>
+        <span class="execution-status-dot" aria-hidden="true"></span>
+        <span id="execution-status-text"></span>
+      </div>
+
+      <footer id="composer" class="composer" hidden>
+        <form id="message-form" class="message-form">
+          <label class="sr-only" for="message-input">发送消息</label>
+          <textarea id="message-input" rows="1" maxlength="4000" placeholder="随心输入"></textarea>
+          <button id="send-button" class="send-button" type="submit" aria-label="发送" title="发送">
+            <span aria-hidden="true">↑</span>
+          </button>
+        </form>
+        <div id="readonly-bar" class="readonly-bar" hidden>只读权限</div>
+        <p id="composer-status" class="composer-status" role="status"></p>
+      </footer>
+    </section>
+  </div>
+
+  <section id="devices-view" class="mobile-devices-view" aria-label="已配对设备" hidden>
+    <header class="mobile-appbar"><h1>已配对设备</h1><button id="devices-settings-button" class="mobile-icon-button" type="button" aria-label="打开设置" title="设置">&#9881;</button></header>
+    <div class="devices-scroll">
+      <p class="devices-intro">选择一台在线电脑，查看授权项目与会话。</p>
+      <button id="current-device-button" class="device-card" type="button"><span class="device-icon" aria-hidden="true">&#9638;</span><span class="device-copy"><strong id="mobile-device-name">Windows 电脑</strong><small id="mobile-device-state">正在连接</small></span><span id="mobile-device-badge" class="device-badge">离线</span><b aria-hidden="true">›</b></button>
+      <button id="add-device-button" class="add-device-button" type="button">扫描二维码连接电脑</button>
+    </div>
+  </section>
+
+  <section id="settings-view" class="mobile-settings-view" aria-label="设置" hidden>
+    <header class="mobile-appbar"><h1>设置</h1><button id="settings-close-button" class="mobile-icon-button" type="button" aria-label="返回" title="返回">&#8592;</button></header>
+    <div class="settings-scroll">
+      <section class="settings-profile"><span class="settings-avatar" aria-hidden="true">C</span><div><strong>Codex Remote</strong><p id="settings-entitlement">连接状态正在同步</p></div></section>
+      <section class="settings-group"><h2>通知</h2><label class="settings-row"><span><strong>推送通知</strong><small>会话消息与连接状态变化</small></span><input id="notification-toggle" type="checkbox" role="switch"><i aria-hidden="true"></i></label></section>
+      <section class="settings-group"><h2>外观</h2><div class="settings-row"><span><strong>主题</strong><small>仅影响此设备上的显示</small></span><div id="theme-picker" class="theme-picker" role="group" aria-label="主题"><button type="button" data-theme-choice="light">浅色</button><button type="button" data-theme-choice="dark">深色</button><button type="button" data-theme-choice="system">自动</button></div></div></section>
+      <section class="settings-group"><h2>连接</h2><button id="network-diagnostics-button" class="settings-row settings-action" type="button"><span><strong>网络诊断</strong><small>检查当前远程通道状态</small></span><b aria-hidden="true">›</b></button></section>
+      <section class="settings-group"><h2>关于</h2><div class="settings-row"><span><strong>版本</strong><small id="settings-version">Codex Remote Android</small></span></div></section>
+      <button id="settings-disconnect-button" class="settings-disconnect" type="button">断开并返回连接页</button>
+    </div>
+  </section>
+
+  <nav class="mobile-bottom-nav" aria-label="主导航">
+    <button class="mobile-nav-item" type="button" data-mobile-tab="sessions"><span aria-hidden="true">&#9741;</span><small>会话</small></button>
+    <button class="mobile-nav-item active" type="button" data-mobile-tab="projects"><span aria-hidden="true">&#8862;</span><small>项目</small></button>
+    <button class="mobile-nav-item" type="button" data-mobile-tab="devices"><span aria-hidden="true">&#9638;</span><small>设备</small></button>
+    <button class="mobile-nav-item" type="button" data-mobile-tab="settings"><span aria-hidden="true">&#9881;</span><small>设置</small></button>
+  </nav>
+
+  <div id="route-view" hidden aria-live="polite"></div>
+
+  <section id="file-preview" class="file-preview" role="dialog" aria-modal="true" aria-labelledby="file-preview-title" hidden>
+    <header class="file-preview-header">
+      <button id="file-preview-close" class="icon-button" type="button" aria-label="关闭文件预览" title="关闭">
+        <span aria-hidden="true">×</span>
+      </button>
+      <div class="file-preview-heading">
+        <h1 id="file-preview-title">文件预览</h1>
+        <span id="file-preview-kind"></span>
+      </div>
+    </header>
+    <div id="file-preview-body" class="file-preview-body">
+      <p id="file-preview-state" class="file-preview-state" role="status"></p>
+      <article id="file-preview-markdown" class="markdown-preview" hidden></article>
+      <pre id="file-preview-text" class="text-preview" hidden></pre>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="alert" hidden></div>
+</body>
+</html>
+
+

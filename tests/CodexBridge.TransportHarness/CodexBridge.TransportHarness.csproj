@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CodexBridge.Host\CodexBridge.Host.csproj" />
+    <ProjectReference Include="..\..\src\CodexBridge.Remote.Protocol\CodexBridge.Remote.Protocol.csproj" />
+  </ItemGroup>
+</Project>

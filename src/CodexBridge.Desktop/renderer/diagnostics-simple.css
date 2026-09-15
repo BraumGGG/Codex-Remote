@@ -1,0 +1,4 @@
+/* 诊断只呈现 Host 实际报告为运行中的服务。 */
+.diagnostics-simple-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.diagnostics-simple-head h2{margin:0 0 3px;font-size:15px}
+.diagnostics-simple-head p{margin:0;color:var(--text-3);font-size:12px}

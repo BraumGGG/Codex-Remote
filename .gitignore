@@ -1,0 +1,78 @@
+# Build outputs and local dependency caches
+bin/
+obj/
+**/bin/
+**/obj/
+node_modules/
+.electron-runtime/
+.tools/
+.dotnet-home/
+.test-state/
+.gradle/
+android/.gradle/
+android/**/build/
+
+# Local state, credentials, logs and diagnostics
+.env
+.env.*
+!.env.example
+.secrets/
+.safety/
+.research/
+.tmp-*
+*.log
+*.trace
+*.dmp
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated packages and release archives
+artifacts/
+dist/
+publish/
+*.exe
+*.msi
+*.apk
+*.aab
+*.tar.gz
+*.zip
+
+# Local backups and handoff material
+backups/
+docs/PROJECT-HANDOFF-*.md
+docs/NEW-SESSION-TAKEOVER-PROMPT.md
+docs/HANDOFF-*.md
+docs/acceptance/
+docs/superpowers/
+docs/plans/
+docs/research/
+docs/testing/webrtc-remote-acceptance.md
+tests/acceptance/
+UI-DEVELOPER-HANDOFF.md
+findings.md
+progress.md
+task_plan.md
+
+# IDE/OS files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+Thumbs.db
+Desktop.ini
+
+# Keep deploy templates, never local production overrides
+deploy/**/*.local.*
+deploy/**/production.*
+
+# Server-side deployment material is kept local and is never part of the OSS tree
+deploy/
+!deploy/README.md
+docs/deployment/*
+!docs/deployment.md
+scripts/build-cloud-release.ps1
+scripts/measure-large-workspace.ps1
+scripts/measure-m5-capacity.ps1
+scripts/measure-transport.ps1

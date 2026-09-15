@@ -1,0 +1,17 @@
+{
+  "name": "codex-bridge-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Codex Remote Electron desktop client",
+  "main": "main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "test:syntax": "node --check main/index.js && node --check main/host-client.js && node --check preload/index.js && node --check renderer/app.js"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3"
+  },
+  "dependencies": {
+    "qrcode": "1.5.4"
+  }
+}

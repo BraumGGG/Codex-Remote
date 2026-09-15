@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex Remote 授权控制台</title>
+  <link rel="stylesheet" href="/admin/admin.css?v=2026090301">
+  <style>[hidden] { display: none !important; }</style>
+  <script type="module" src="/admin/admin.js?v=2026090301"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('login-form');
+      const input = document.getElementById('admin-token');
+      if (!form || !input) return;
+      const storageKey = 'codex-remote-admin-token';
+      const normalize = value => {
+        let token = String(value || '').trim().replace(/^['"]|['"]$/g, '');
+        const marker = 'CODEX_BRIDGE_ENTITLEMENT_ADMIN_TOKEN=';
+        if (token.includes(marker)) token = token.slice(token.indexOf(marker) + marker.length).trim();
+        return token.split(/\r?\n/)[0].trim();
+      };
+      input.addEventListener('input', () => { input.value = normalize(input.value); });
+      form.addEventListener('submit', () => {
+        const token = normalize(input.value);
+        input.value = token;
+        if (token) localStorage.setItem(storageKey, token);
+      }, true);
+      const saved = normalize(localStorage.getItem(storageKey));
+      if (saved) { input.value = saved; setTimeout(() => form.requestSubmit(), 0); }
+    });
+  </script>
+</head>
+<body>
+  <main>
+    <section id="login-view" class="login-view" aria-labelledby="login-title">
+      <form id="login-form" class="login-form">
+        <div class="login-brand"><span class="mark" aria-hidden="true">C</span><strong>Codex Remote</strong></div>
+        <p class="eyebrow">ADMIN ACCESS</p>
+        <h1 id="login-title">管理员登录</h1>
+        <p class="login-copy">授权与设备管理控制台</p>
+        <label for="admin-token">管理员令牌</label>
+        <input id="admin-token" name="token" type="password" autocomplete="current-password" required minlength="32">
+        <button type="submit">进入控制台</button>
+        <p id="login-error" class="form-error" role="alert"></p>
+      </form>
+    </section>
+
+    <div id="console-view" class="console" hidden>
+      <aside class="admin-sidebar" aria-label="管理导航">
+        <div class="admin-brand"><span class="mark" aria-hidden="true">C</span><div><strong>Codex Remote</strong><span>Admin Console</span></div></div>
+        <p class="nav-label">授权</p>
+        <a class="nav-item active" href="#licenses">授权总览</a>
+        <a class="nav-item" href="#activation-requests">激活申请</a>
+        <a class="nav-item" href="#invite-form">邀请码</a>
+        <a class="nav-item" href="#grant-form">赠送 Pro</a>
+        <div class="sidebar-status"><span id="status-dot"></span><span id="status-text">未连接</span></div>
+      </aside>
+
+      <div class="admin-main">
+        <header class="page-header">
+          <div><p class="eyebrow">ENTITLEMENTS</p><h1>授权总览</h1><p>管理 Pro 授权、邀请码与设备凭据</p></div>
+          <button id="refresh-button" class="secondary" type="button" aria-label="刷新授权记录">刷新</button>
+        </header>
+
+        <section class="summary-band" aria-label="授权汇总">
+          <div><span>有效授权</span><strong id="active-count">0</strong><small>当前可用</small></div>
+          <div><span>已撤销</span><strong id="revoked-count">0</strong><small>历史记录</small></div>
+          <div><span>注册用户</span><strong id="registered-count">0</strong><small>已注册账号</small></div>
+          <div><span>当前在线</span><strong id="online-count">0</strong><small id="online-detail">电脑 0 · 手机 0</small></div>
+          <div><span>近 7 日活跃</span><strong id="active-7d-count">0</strong><small id="active-today-count">今日 0</small></div>
+        </section>
+
+        <div class="workspace">
+          <aside class="actions" aria-label="授权操作">
+          <form id="invite-form">
+            <p class="eyebrow">INVITE</p>
+            <h2>创建 Pro 邀请码</h2>
+            <p class="form-copy">创建一次性或有限次数使用的邀请码。</p>
+            <label for="invite-email">发送到邮箱（可选）</label>
+            <input id="invite-email" type="email" placeholder="粉丝邮箱">
+            <label for="invite-days">授权天数</label>
+            <input id="invite-days" type="number" min="1" max="366" value="30" required>
+            <label for="invite-count">可兑换次数</label>
+            <input id="invite-count" type="number" min="1" max="1000" value="1" required>
+            <button type="submit">创建</button>
+          </form>
+          <form id="grant-form">
+            <p class="eyebrow">DIRECT GRANT</p>
+            <h2>直接赠送 Pro</h2>
+            <p class="form-copy">绑定指定电脑和手机，凭据仅展示一次。</p>
+            <label for="grant-user">用户 ID</label>
+            <input id="grant-user" required maxlength="128">
+            <label for="grant-host">电脑 ID</label>
+            <input id="grant-host" required maxlength="128">
+            <label for="grant-device">手机 ID</label>
+            <input id="grant-device" required maxlength="128">
+            <label for="grant-days">授权天数</label>
+            <input id="grant-days" type="number" min="1" max="366" value="30" required>
+            <button type="submit">授予</button>
+          </form>
+          </aside>
+
+          <section id="licenses" class="licenses" aria-labelledby="licenses-title">
+            <div class="section-heading"><div><p class="eyebrow">LICENSES</p><h2 id="licenses-title">授权记录</h2></div></div>
+            <div class="table-wrap">
+            <table>
+              <thead><tr><th>用户</th><th>电脑 / 手机</th><th>套餐</th><th>到期</th><th>状态</th><th><span class="sr-only">操作</span></th></tr></thead>
+              <tbody id="license-body"></tbody>
+            </table>
+            <p id="empty-state" class="empty-state">暂无授权记录</p>
+            </div>
+          </section>
+        </div>
+        <section id="activation-requests" class="licenses activation-requests" aria-labelledby="activation-requests-title">
+          <div class="section-heading"><div><p class="eyebrow">ACTIVATION REQUESTS</p><h2 id="activation-requests-title">激活码申请</h2></div><span id="pending-request-count" class="request-count">待审核 0</span></div>
+          <div class="table-wrap"><table><thead><tr><th>抖音 ID</th><th>邮箱</th><th>申请时间</th><th>状态</th><th>激活码</th><th>有效期</th><th>激活状态</th><th>操作</th></tr></thead><tbody id="activation-request-body"></tbody></table><p id="activation-request-empty" class="empty-state">暂无激活申请</p></div>
+        </section>
+        <section id="invites" class="licenses invite-records" aria-labelledby="invites-title">
+          <div class="section-heading"><div><p class="eyebrow">INVITE AUDIT</p><h2 id="invites-title">激活码记录</h2></div></div>
+          <div class="table-wrap"><table><thead><tr><th>发送邮箱</th><th>激活码</th><th>创建时间</th><th>失效时间</th><th>状态</th><th>兑换账号</th></tr></thead><tbody id="invite-body"></tbody></table><p id="invite-empty" class="empty-state">暂无激活码记录</p></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <dialog id="result-dialog">
+    <form method="dialog"><button class="close" aria-label="关闭" title="关闭">×</button></form>
+    <p class="eyebrow" id="result-label">RESULT</p>
+    <h2 id="result-title"></h2>
+    <code id="result-value"></code>
+    <p class="credential-warning">该凭据只展示一次，请立即妥善保存。</p>
+    <button id="copy-result" type="button">复制凭据</button>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
+

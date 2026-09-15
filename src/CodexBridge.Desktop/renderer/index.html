@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CR</title>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="workspace-pages.css">
+  <link rel="stylesheet" href="diagnostics-simple.css">
+  <script src="qrcode.min.js"></script>
+</head>
+<body>
+  <section class="auth-gate" id="auth-gate" hidden>
+    <div class="auth-panel"><div class="brand"><span class="brand-mark">CR</span><span class="brand-name">Codex Remote</span></div>
+      <section class="auth-view" data-auth-view="login"><h1>登录 Codex Remote</h1><p>登录后即可使用本机 Codex 远程控制。</p><input id="auth-login-email" type="email" placeholder="邮箱地址" autocomplete="email"><input id="auth-login-password" type="password" placeholder="密码" autocomplete="current-password"><button class="toolbar-button primary auth-main-button" id="auth-login" type="button">登录</button><div class="auth-links"><button class="auth-link" id="auth-show-register" type="button">注册账号</button><button class="auth-link" id="auth-show-reset" type="button">忘记密码</button></div></section>
+      <section class="auth-view" data-auth-view="register" hidden><h1>注册账号</h1><p>使用邮箱注册，验证码将发送到你的邮箱。</p><input id="auth-register-email" type="email" placeholder="邮箱地址" autocomplete="email"><input id="auth-register-password" type="password" placeholder="密码（至少 8 位）" autocomplete="new-password"><input id="auth-register-code" type="text" inputmode="numeric" placeholder="邮箱验证码"><button class="toolbar-button auth-main-button" id="auth-register" type="button">发送验证码</button><button class="toolbar-button primary auth-main-button" id="auth-verify" type="button">完成注册</button><button class="auth-back" data-auth-back="login" type="button">返回登录</button></section>
+      <section class="auth-view" data-auth-view="reset" hidden><h1>重置密码</h1><p>输入注册邮箱，获取验证码后设置新密码。</p><input id="auth-reset-email" type="email" placeholder="邮箱地址" autocomplete="email"><input id="auth-reset-password" type="password" placeholder="新密码（至少 8 位）" autocomplete="new-password"><input id="auth-reset-code" type="text" inputmode="numeric" placeholder="邮箱验证码"><button class="toolbar-button auth-main-button" id="auth-reset-request" type="button">发送验证码</button><button class="toolbar-button primary auth-main-button" id="auth-reset-confirm" type="button">重置密码</button><button class="auth-back" data-auth-back="login" type="button">返回登录</button></section>
+      <section class="auth-view" data-auth-view="activate" hidden><h1>激活 Windows 客户端</h1><p>请输入一次性激活码解锁本机功能。</p><input id="auth-activate-code" type="text" placeholder="激活码" autocomplete="off"><p class="auth-tip">关注抖音号“BraumG”，免费获取使用。</p><button class="toolbar-button primary auth-main-button" id="auth-activate" type="button">激活客户端</button></section>
+      <div class="auth-message" id="auth-message"></div></div>
+  </section>
+  <div class="app-shell">
+    <header class="toolbar">
+      <div class="brand"><span class="brand-mark">CR</span><span class="brand-name">Codex Remote</span></div>
+      <div class="toolbar-rule"></div>
+      <button class="toolbar-button primary" id="refresh-button" type="button">刷新</button>
+      <button class="toolbar-button" id="diag-button" type="button">打开诊断</button>
+      <div class="toolbar-spacer"></div>
+      <span class="connection"><i id="toolbar-dot"></i><span id="toolbar-status">正在连接本机 Host</span></span>
+    </header>
+    <div class="app-content">
+      <aside class="sidebar" aria-label="主导航">
+        <nav class="navigation">
+          <button class="nav-item active" type="button" data-page="overview"><span class="nav-icon">⌂</span>概览</button>
+          <button class="nav-item" type="button" data-page="pair"><span class="nav-icon">◇</span>公网配对</button>
+          <button class="nav-item" type="button" data-page="projects"><span class="nav-icon">▦</span>授权项目</button>
+          <button class="nav-item" type="button" data-page="devices"><span class="nav-icon">▤</span>设备管理<span class="nav-count" id="device-count">0</span></button>
+          <button class="nav-item" type="button" data-page="diagnostics"><span class="nav-icon">⌁</span>诊断</button>
+          <button class="nav-item" type="button" data-page="account"><span class="nav-icon">◎</span>账号</button>
+        </nav>
+        <div class="sidebar-foot">
+          <span>Electron Preview</span><span id="version">--</span>
+        </div>
+      </aside>
+      <main class="workspace">
+        <section class="page active" data-page="overview">
+          <div class="page-heading"><div><h1>概览</h1><p>本机 Host 和桌面连接的实时状态。</p></div><span class="page-updated" id="updated-at">等待数据</span></div>
+          <div class="metric-grid">
+            <article class="metric-card"><span class="metric-label">Host 服务</span><strong id="host-state">正在检测</strong><span class="metric-detail" id="host-detail">127.0.0.1</span></article>
+            <article class="metric-card"><span class="metric-label">Codex Desktop</span><strong id="desktop-state">正在检测</strong><span class="metric-detail">当前 Windows 会话</span></article>
+            <article class="metric-card"><span class="metric-label">已配对设备</span><strong id="overview-device-count">0</strong><span class="metric-detail">来自受保护的本机接口</span></article>
+          </div>
+          <section class="panel overview-panel"><div class="panel-heading"><div><h2>连接状态</h2><p>Electron 通过主进程访问本机 Host；渲染进程不具备网络或 Node 权限。</p></div><span class="state-badge" id="overview-badge">检测中</span></div><div class="info-list"><div><span>Host 版本</span><b id="host-version">--</b></div><div><span>管理接口</span><b>仅 127.0.0.1</b></div><div><span>访问控制</span><b>Token + Nonce</b></div></div></section>
+        </section>
+        <section class="page" data-page="pair">
+          <div class="page-heading compact-heading"><div><h1>公网配对</h1><p>通过受保护的本机 Host 生成并管理远程配对会话。</p></div><button class="toolbar-button" id="pair-refresh" type="button">刷新状态</button></div>
+          <div class="pair-layout">
+            <section class="pair-card pair-code-card"><div class="pair-card-head"><div><h2>扫码发起配对</h2><p>请使用手机扫描二维码连接。</p></div><span class="state-badge" id="pair-badge">检测中</span></div><div class="qr-frame" id="pair-qr" aria-label="配对二维码"><span>等待配对会话</span></div><p class="pair-expiry" id="pair-expiry">远程配对尚未开启</p></section>
+            <div class="pair-side"><section class="panel pair-summary"><span class="section-kicker">配对状态</span><div class="pair-status-line"><i id="pair-status-dot"></i><strong id="pair-state">正在检查</strong></div><p id="pair-detail">正在读取本机 Host 的配对服务状态。</p></section><section class="security-panel"><span class="section-kicker">本机安全边界</span><strong>端到端配对会话</strong><ul><li>配对地址由本机 Host 签发。</li><li>Electron 渲染进程无法直接访问网络与本地文件。</li><li>管理调用需要一次性 Token 与 Nonce。</li></ul></section><section class="panel paired-summary"><div class="panel-heading"><div><h2>已配对设备</h2><p>设备列表来自当前 Host。</p></div><span id="pair-device-total" class="state-badge">0 台</span></div><div id="pair-device-list" class="compact-list"></div></section></div>
+          </div>
+        </section>
+        <section class="page" data-page="projects">
+          <div class="page-heading compact-heading"><div><h1>授权项目</h1><p>仅授权本机 Codex 已发现的项目；手机端只能读取已授权范围。</p></div><span class="page-updated" id="projects-updated">等待数据</span></div>
+          <section class="table-panel projects-panel"><div class="projects-toolbar"><div><h2>项目访问</h2><p id="projects-summary">正在读取本机 Codex 项目</p></div><input id="projects-search" class="search-input" type="search" placeholder="搜索项目名称" autocomplete="off"></div><div class="project-table-head"><span>项目</span><span>会话</span><span>最近活动</span><span>远程访问</span><span>发送指令</span></div><div id="project-list" class="project-table-body"><div class="table-placeholder">正在读取项目</div></div></section>
+        </section>
+        <section class="page" data-page="devices"><div class="page-heading compact-heading"><div><h1>设备管理</h1><p>管理已授权设备及其访问状态。</p></div><span class="page-updated" id="devices-updated">等待数据</span></div><div class="devices-layout"><section class="table-panel devices-panel"><div class="devices-toolbar"><div><h2>已配对设备</h2><p id="devices-summary">正在读取设备列表</p></div><input id="devices-search" class="search-input" type="search" placeholder="搜索设备名称" autocomplete="off"></div><div class="table-head"><span>设备</span><span>传输方式</span><span>最近活动</span><span>操作</span></div><div id="device-list" class="table-body"><div class="table-placeholder">正在读取设备列表</div></div></section><aside class="device-detail panel" id="device-detail"><span class="section-kicker">设备详情</span><div class="detail-empty"><div class="detail-icon">▤</div><strong>选择一台设备</strong><p>从左侧列表查看授权方式、设备标识和最近活动。</p></div></aside></div></section>
+        <section class="page" data-page="diagnostics"><div class="page-heading compact-heading"><div><h1>诊断</h1><p>仅显示当前实际可用的本机服务。</p></div><button class="toolbar-button primary" id="diagnostics-refresh" type="button">重新检测</button></div><section class="diagnostics-workbench"><div class="diagnostics-simple-head"><div><h2>运行中的服务</h2><p id="diagnostics-summary-text">正在读取服务状态</p></div><span class="state-badge online" id="diagnostics-count">0 项</span></div><section class="service-table" id="diagnostics-services"><div class="table-placeholder">正在读取服务状态</div></section></section></section>
+        <section class="page" data-page="account"><div class="page-heading compact-heading"><div><h1>账号</h1><p>查看账号状态和已绑定的 Windows 电脑授权。</p></div><button class="toolbar-button" id="account-refresh" type="button">刷新</button></div><div class="account-layout"><section class="panel account-profile"><div class="account-profile-head"><span class="account-avatar">CR</span><div><h2 id="account-email">--</h2><p id="account-status">正在读取账号信息</p></div></div><div class="account-details"><div><span>账号注册时间</span><b id="account-created-at">--</b></div><div><span>邮箱状态</span><b id="account-verified">--</b></div><div><span>当前设备 ID</span><b id="account-device-id">--</b></div></div><button class="toolbar-button destructive" id="account-logout" type="button">退出登录</button></section><section class="table-panel account-licenses"><div class="devices-toolbar"><div><h2>我的电脑授权</h2><p id="account-license-summary">--</p></div></div><div class="account-license-head"><span>电脑 / Host</span><span>套餐</span><span>到期时间</span><span>最近在线</span><span>状态</span></div><div id="account-license-list" class="account-license-list"></div></section></div></section>
+      </main>
+    </div>
+    <footer class="statusbar"><span><i id="status-dot"></i><b id="status-text">Host 正在连接</b></span><span class="status-divider"></span><span>本机受控接口</span><span class="status-divider"></span><span>Electron 独立 UI</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop" id="revoke-modal" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="revoke-title"><div class="modal-title"><span class="danger-mark">!</span><h2 id="revoke-title">撤销设备授权</h2></div><div class="modal-body"><p>确认撤销 <strong id="revoke-device-name"></strong> 的远程访问权限？</p><p class="muted">该设备将立即断开；之后需要重新配对才能访问本机。</p></div><div class="modal-actions"><button class="toolbar-button" id="revoke-cancel" type="button">取消</button><button class="toolbar-button destructive" id="revoke-confirm" type="button">撤销授权</button></div></section></div>
+  <script src="app.js"></script>
+</body>
+</html>

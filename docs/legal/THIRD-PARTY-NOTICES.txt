@@ -1,0 +1,15 @@
+Codex Bridge 第三方组件声明（Windows 封闭测试版）
+
+本文件列出直接运行时依赖。完整组件版本由 package-manifest.json 和应用 deps.json 固定。
+
+- .NET / ASP.NET Core 8.0：MIT，https://github.com/dotnet/runtime
+- Microsoft.Data.Sqlite 8.0.20：MIT，https://github.com/dotnet/efcore
+- SQLite：Public Domain，https://sqlite.org/copyright.html
+- FlaUI.Core / FlaUI.UIA3 5.0.0：MIT，https://github.com/FlaUI/FlaUI
+- Markdig 0.41.3：BSD-2-Clause，https://github.com/xoofx/markdig
+- QRCoder 1.6.0：MIT，https://github.com/codebude/QRCoder
+- Pion WebRTC 4.2.18 及其 Go 依赖：MIT/BSD 类许可证，https://github.com/pion/webrtc
+- marked：MIT，https://github.com/markedjs/marked
+- DOMPurify：Apache-2.0 OR MPL-2.0，https://github.com/cure53/DOMPurify
+
+随 payload 的 licenses 目录提供项目内可获得的许可证原文。各组件版权归其作者所有。

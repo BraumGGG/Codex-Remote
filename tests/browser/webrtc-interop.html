@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Codex Bridge WebRTC Interop</title>
+  </head>
+  <body>
+    <output id="status">starting</output>
+    <script type="module">
+      const result = { state: "starting", received: null, candidatePair: null, error: null };
+      window.__interopResult = result;
+      const status = document.querySelector("#status");
+
+      function waitForIceGathering(peer) {
+        if (peer.iceGatheringState === "complete") return Promise.resolve();
+        return new Promise((resolve) => {
+          const listener = () => {
+            if (peer.iceGatheringState === "complete") {
+              peer.removeEventListener("icegatheringstatechange", listener);
+              resolve();
+            }
+          };
+          peer.addEventListener("icegatheringstatechange", listener);
+        });
+      }
+
+      async function selectedCandidatePair(peer) {
+        const stats = await peer.getStats();
+        for (const report of stats.values()) {
+          if (report.type === "transport" && report.selectedCandidatePairId) {
+            const pair = stats.get(report.selectedCandidatePairId);
+            const local = pair ? stats.get(pair.localCandidateId) : null;
+            const remote = pair ? stats.get(pair.remoteCandidateId) : null;
+            return {
+              state: pair?.state || null,
+              localType: local?.candidateType || null,
+              remoteType: remote?.candidateType || null,
+            };
+          }
+        }
+        return null;
+      }
+
+      try {
+        const peer = new RTCPeerConnection();
+        window.__interopPeer = peer;
+        const channel = peer.createDataChannel("codex-bridge-v1");
+          channel.binaryType = "arraybuffer";
+          channel.addEventListener("open", () => channel.send(new TextEncoder().encode("browser->pion")));
+          channel.addEventListener("message", async (event) => {
+          result.received = new TextDecoder().decode(event.data);
+          result.candidatePair = await selectedCandidatePair(peer);
+          result.state = "complete";
+          status.textContent = "complete";
+        });
+
+        await peer.setLocalDescription(await peer.createOffer());
+        await waitForIceGathering(peer);
+        const response = await fetch("/offer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(peer.localDescription),
+        });
+        if (!response.ok) throw new Error(`offer failed: ${response.status}`);
+        await peer.setRemoteDescription(await response.json());
+        result.state = "connecting";
+        status.textContent = "connecting";
+      } catch (error) {
+        result.state = "failed";
+        result.error = String(error);
+        status.textContent = "failed";
+      }
+    </script>
+  </body>
+</html>
