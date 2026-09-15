@@ -25,7 +25,10 @@ Codex Remote 是一个开源的远程桥接项目：让你在 Android 手机上�
 
 ## 下载
 
-安装包和 APK 请前往 GitHub **Releases** 页面下载。推荐使用 Electron Windows 安装包和 Android APK，并在安装前核对 Release 中提供的 SHA-256。
+安装包和 APK 请前往 GitHub **Releases** 页面下载。推荐使用 Electron Windows 安装包和 Android APK，并在安装前核对 SHA-256：
+
+- Electron Windows：`9A9D9451B488B5549443BE58EFDC3E95BF0B3F232E354CECC54B6DC0A5F9B343`
+- Android APK：`17E1A4706120BD30A25AD06874D98F4DE5A1C23E6B6E5B3BA4FED13FE627E51D`
 
 ## 直接使用博主部署的服务
 
