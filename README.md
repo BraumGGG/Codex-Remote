@@ -1,27 +1,21 @@
 # Codex Remote
 
-Codex Remote is an open-source bridge for viewing and controlling an official
-Codex Desktop session from an Android device over authenticated HTTPS,
-WebSocket signaling, and WebRTC.
+Codex Remote 是一个开源桥接项目，让 Android 手机可以通过经过身份验证的 HTTPS、WebSocket 信令和 WebRTC，查看并控制官方 Codex Desktop 会话。
 
-The Windows client is Electron and runs a local .NET Host. The Host reads only
-explicitly authorized projects and sessions. Read-only access is available to
-paired devices; sending is guarded by server-issued entitlement and always
-targets a real thread UUID.
+Windows 客户端采用 Electron，并运行本机 .NET Host。Host 只读取用户明确授权的项目和会话。已配对设备默认只能查看；发送能力由服务端签发的授权控制，并且始终针对真实的 thread UUID。
 
-## Components
+## 项目组成
 
-- `src/CodexBridge.Desktop`: Electron Windows client.
-- `src/CodexBridge.Host`, `src/CodexBridge.Windows`: local Host integration.
-- `src/CodexBridge.Signal`, `src/CodexBridge.Transport`: signaling and transport.
-- `src/CodexBridge.Entitlement.Server`: optional account and entitlement API.
-- `android/`: Android client.
-- `tests/`: .NET, Go, and browser-facing tests.
+- `src/CodexBridge.Desktop`：Electron Windows 客户端。
+- `src/CodexBridge.Host`、`src/CodexBridge.Windows`：本机 Host 与 Codex 数据集成。
+- `src/CodexBridge.Signal`、`src/CodexBridge.Transport`：信令与 WebRTC 传输。
+- `src/CodexBridge.Entitlement.Server`：可选的账号与授权 API。
+- `android/`：Android 客户端。
+- `tests/`：.NET、Go 以及浏览器端测试。
 
-## Development
+## 开发环境
 
-Requirements: .NET 8 SDK, Node.js/npm, Go, and (for Android) the Android SDK.
-Windows is required for the Electron client and Windows integration.
+需要安装：.NET 8 SDK、Node.js/npm、Go，以及 Android 开发所需的 Android SDK。Electron 客户端和 Windows 集成需要 Windows 系统。
 
 ```powershell
 dotnet restore CodexBridge.sln
@@ -30,21 +24,16 @@ node --check src/CodexBridge.Desktop/main/index.js
 node --check src/CodexBridge.Desktop/renderer/app.js
 ```
 
-Safety scripts use fake senders and isolated state. Never point them at a real
-Codex session for testing.
+安全脚本使用 fake sender 和隔离状态进行测试。请勿将测试指向真实 Codex 会话。
 
-## Self-hosting
+## 自建服务
 
-See [docs/deployment.md](docs/deployment.md). It is intentionally generic and
-contains no production infrastructure or credentials. Operators must provide
-all deployment values through private configuration.
+请阅读 [部署说明](docs/deployment.md)。该文档只描述通用部署方式，不包含任何生产基础设施或凭据。部署者必须通过私有配置提供所有环境参数。
 
-## Security
+## 安全问题
 
-Do not report vulnerabilities in public issues. Use a private security channel
-provided by the repository maintainers and never include credentials or
-production logs.
+请不要在公开 Issue 中报告安全漏洞。请通过仓库维护者提供的私密渠道报告，并且不要附带凭据或生产日志。
 
-## License
+## 许可证
 
-Licensed under the [Apache License 2.0](LICENSE).
+本项目采用 [Apache License 2.0](LICENSE) 开源。

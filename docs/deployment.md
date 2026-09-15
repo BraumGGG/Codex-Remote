@@ -1,80 +1,60 @@
-# Self-hosted deployment
+# 自建部署说明
 
-This document describes a generic deployment. It intentionally contains no
-production hostname, IP address, SSH target, certificate, account, release
-identifier, or secret from any project instance.
+本文档只介绍通用部署思路，**不包含任何真实生产环境信息**。文档中没有作者的域名、IP 地址、SSH 主机、证书、账号、密钥、生产路径或线上版本号。
 
-## Topology
+## 部署组成
 
-Run the following components on infrastructure you control:
+请在你自己管理的基础设施上部署以下组件：
 
-- `CodexBridge.Signal`: WebSocket signaling service.
-- `CodexBridge.Entitlement.Server`: optional account and entitlement API.
-- Caddy or another reverse proxy for HTTPS and WebSocket forwarding.
-- coturn for TURN relay when direct WebRTC connectivity is unavailable.
-- A Windows Electron client running the local .NET Host.
+- `CodexBridge.Signal`：WebSocket 信令服务。
+- `CodexBridge.Entitlement.Server`：可选的账号与授权 API。
+- Caddy、Nginx 或其他反向代理：负责 HTTPS 和 WebSocket 转发。
+- coturn：在无法直连时提供 WebRTC TURN 中继。
+- Windows Electron 客户端：运行本机 .NET Host。
 
-Use a placeholder domain such as `remote.example.invalid` while adapting the
-configuration. Replace it only in your private deployment files.
+本文档使用 `remote.example.invalid` 作为示例域名。部署时请在私有配置中替换为你自己的域名，**不要把真实值写回公开仓库**。
 
-## Secrets and configuration
+## 配置与密钥
 
-Never commit real values. Supply these through the service manager, a secret
-store, or an untracked environment file:
+真实值必须通过服务管理器、密钥管理系统或未跟踪的环境文件注入，禁止提交到 Git：
 
-- TLS certificate and private key
-- Signal signing keys
-- Entitlement signing keys
-- TURN username/password or shared secret
-- Administrator token
-- SMTP credentials
-- Database or data-directory credentials
+- TLS 证书和私钥
+- Signal 签名密钥
+- 授权签名密钥
+- TURN 用户名、密码或共享密钥
+- 管理员令牌
+- SMTP 凭据
+- 数据目录或数据库凭据
 
-Start from the `*.example` files in `deploy/` and keep private overrides
-outside Git. The repository must remain usable without access to any author's
-infrastructure.
+## 反向代理
 
-## Reverse proxy
+你的反向代理需要根据实际部署转发：
 
-Configure your proxy to forward:
+- `/signal` 到 Signal 服务，并支持 WebSocket Upgrade。
+- `/api/` 到授权服务（如果启用）。
+- `/remote/` 和静态资源到 Web 客户端。
 
-- `/signal` to the Signal service with WebSocket upgrade support.
-- `/api/` to the entitlement service when enabled.
-- `/remote/` and static assets to the web host.
+TLS 证书必须签发给你自己的域名。不要复用其他安装实例的证书、私钥或主机配置。
 
-Terminate TLS at the proxy using a certificate issued for your own domain.
-Do not reuse certificates, keys, or host-specific snippets from another
-installation.
+## 服务运行
 
-## Services
+使用 .NET 8 SDK 构建解决方案，并构建 `src/CodexBridge.Transport` 下的 Go 传输组件。建议每个服务使用独立的非 root 用户运行，限制文件权限，并在服务管理器中配置重启策略和健康检查。服务数据应放在 Git 工作区之外。
 
-Build the solution with the .NET 8 SDK and build the Go transport sidecar from
-`src/CodexBridge.Transport`. Run each service under a dedicated non-root user,
-restrict file permissions, and configure restart and health checks with your
-service manager. Keep service data outside the Git checkout.
+## TURN 配置
 
-## TURN
+根据 coturn 官方文档安装服务。配置时使用你自己的 realm、监听地址、证书路径和认证密钥，只在私有配置中保存这些值，并根据网络策略开放必要端口。
 
-Install coturn according to its documentation, then copy
-`deploy/webrtc/turnserver.conf.example` to a private configuration path. Set
-your own realm, listener addresses, certificate paths, and authentication
-secret. Open only the ports required by your network policy.
+## Windows 客户端
 
-## Windows client
+使用 `scripts/` 下的构建脚本在本地构建 Electron 客户端。通过客户端配置机制设置你自己的 Signal 和 API 地址。不要把服务端签名私钥或管理员凭据打包进客户端。
 
-Build the Electron client locally using the scripts under `scripts/`. Configure
-the public Signal and API endpoints through the client environment/configuration
-mechanism. Do not bake private signing keys or administrator credentials into
-the client.
+## 发布前检查
 
-## Verification checklist
+1. 确认所有公开 URL 都指向你自己的域名。
+2. 确认 TLS 证书名称和自动续期正常。
+3. 确认 WebSocket Upgrade 和 WebRTC/TURN 连通性。
+4. 确认密钥通过运行时注入，且不在 Git 中。
+5. 运行项目测试与安全检查脚本。
+6. 将备份、日志、监控和故障响应资料保存在仓库之外。
 
-1. Verify that every public URL points to your own domain.
-2. Verify TLS certificate names and renewal.
-3. Verify WebSocket upgrade and WebRTC/TURN connectivity.
-4. Verify that secrets are injected at runtime and absent from Git.
-5. Run the repository safety scripts and tests before exposing the service.
-6. Keep backups, logs, monitoring, and incident response outside this repo.
-
-This project provides software, not an operated service. You are responsible
-for securing and maintaining any deployment you create.
+本项目只提供软件，不提供托管服务。任何自建实例的安全、维护、备份和合规责任由部署者自行承担。
